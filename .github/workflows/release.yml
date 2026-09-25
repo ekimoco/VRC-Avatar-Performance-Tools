@@ -7,8 +7,8 @@ on:
     paths: ./
 
 env:
-  packageName: "de.thryrallo.vrc.avatar-performance-tools"
-  packagePath: "Packages/de.thryrallo.vrc.avatar-performance-tools"
+  packageName: "dev.ekimoco.vrc.avatar-performance-tools"
+  packagePath: "Packages/dev.ekimoco.vrc.avatar-performance-tools"
 
 jobs:
   build:
