@@ -16,12 +16,12 @@ using UnityEngine.SceneManagement;
 using VRC.SDK3.Avatars.Components;
 #endif
 
-namespace Thry.AvatarHelpers {
+namespace EKIMOCO.AvatarHelpers {
     public class AvatarEvaluator : EditorWindow
     {
         public const string VERSION = "1.3.6";
 
-        [MenuItem("Thry/Avatar/Evaluator")]
+        [MenuItem("EKIMOCO/Avatar/Evaluator")]
         static void Init()
         {
             AvatarEvaluator window = (AvatarEvaluator)EditorWindow.GetWindow(typeof(AvatarEvaluator));
@@ -29,10 +29,10 @@ namespace Thry.AvatarHelpers {
             window.Show();
         }
 
-        [MenuItem("GameObject/Thry/Avatar/Evaluator", true, 0)]
+        [MenuItem("GameObject/EKIMOCO/Avatar/Evaluator", true, 0)]
         static bool CanShowFromSelection() => Selection.activeGameObject != null;
 
-        [MenuItem("GameObject/Thry/Avatar/Evaluator", false, 0)]
+        [MenuItem("GameObject/EKIMOCO/Avatar/Evaluator", false, 0)]
         public static void ShowFromSelection()
         {
             AvatarEvaluator window = (AvatarEvaluator)EditorWindow.GetWindow(typeof(AvatarEvaluator));
@@ -118,9 +118,9 @@ namespace Thry.AvatarHelpers {
         private void OnGUI()
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField($"<size=20><color=magenta>Thry's Avatar Evaluator</color></size> v{VERSION}", new GUIStyle(EditorStyles.label) { richText = true, alignment = TextAnchor.MiddleCenter });
+            EditorGUILayout.LabelField($"<size=20><color=magenta>EKIMOCO's Avatar Evaluator</color></size> v{VERSION}", new GUIStyle(EditorStyles.label) { richText = true, alignment = TextAnchor.MiddleCenter });
             if (GUILayout.Button("Click here & follow me on twitter", EditorStyles.centeredGreyMiniLabel))
-                Application.OpenURL("https://twitter.com/thryrallo");
+                Application.OpenURL("https://twitter.com/EKIMOCOrallo");
             EditorGUILayout.Space();
 
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
