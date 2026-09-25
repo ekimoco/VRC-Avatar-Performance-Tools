@@ -9,11 +9,11 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 
-namespace Thry.AvatarHelpers
+namespace EKIMOCO.AvatarHelpers
 {
     public class TextureVRAM : EditorWindow
     {
-        [MenuItem("Thry/Avatar/VRAM")]
+        [MenuItem("EKIMOCO/Avatar/VRAM")]
         public static void Init()
         {
             TextureVRAM window = (TextureVRAM)EditorWindow.GetWindow(typeof(TextureVRAM));
@@ -21,10 +21,10 @@ namespace Thry.AvatarHelpers
             window.Show();
         }
 
-        [MenuItem("GameObject/Thry/Avatar/VRAM", true, 0)]
+        [MenuItem("GameObject/EKIMOCO/Avatar/VRAM", true, 0)]
         static bool CanShowFromSelection() => Selection.activeGameObject != null;
 
-        [MenuItem("GameObject/Thry/Avatar/VRAM", false, 0)]
+        [MenuItem("GameObject/EKIMOCO/Avatar/VRAM", false, 0)]
         public static void ShowFromSelection()
         {
             TextureVRAM window = (TextureVRAM)EditorWindow.GetWindow(typeof(TextureVRAM));
@@ -521,9 +521,7 @@ namespace Thry.AvatarHelpers
                 InitilizeStyles();
             }
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField($"<size=20><color=magenta>Thry's Avatar VRAM Calculator</color></size> v{AvatarEvaluator.VERSION}", new GUIStyle(EditorStyles.label) { richText = true, alignment = TextAnchor.MiddleCenter });
-            if (GUILayout.Button("Click here & follow me on twitter", EditorStyles.centeredGreyMiniLabel))
-                Application.OpenURL("https://twitter.com/thryrallo");
+            EditorGUILayout.LabelField($"<size=20><color=magenta>EKIMOCO's Avatar VRAM Calculator</color></size> v{AvatarEvaluator.VERSION}", new GUIStyle(EditorStyles.label) { richText = true, alignment = TextAnchor.MiddleCenter });
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Information", EditorStyles.boldLabel);
