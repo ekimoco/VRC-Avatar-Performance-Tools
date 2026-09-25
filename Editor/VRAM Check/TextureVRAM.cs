@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
@@ -460,14 +460,24 @@ namespace Thry.AvatarHelpers
         }
 
         GameObject _avatar;
+
         long _sizeActive;
         long _sizeAll;
         long _sizeAllTextures;
         long _sizeAllMeshes;
+        long _sizeAllSkinnedMeshes;
+        long _sizeAllBasicMeshes;
+
         AvatarEvaluator.Quality _pcTextureQuality;
-        AvatarEvaluator.Quality _questTextureQuality;
         AvatarEvaluator.Quality _pcMeshQuality;
+        AvatarEvaluator.Quality _pcSkinnedMeshQuality;
+        AvatarEvaluator.Quality _pcBasicMeshQuality;
+
+        AvatarEvaluator.Quality _questTextureQuality;
         AvatarEvaluator.Quality _questMeshQuality;
+        AvatarEvaluator.Quality _questSkinnedMeshQuality;
+        AvatarEvaluator.Quality _questBasicMeshQuality;
+
         bool _includeInactive = true;
         List<TextureInfo> _texturesList;
         List<MeshInfo> _meshesList;
@@ -575,6 +585,12 @@ namespace Thry.AvatarHelpers
                         EditorGUILayout.LabelField("Quest", GUILayout.Width(40));
                         AvatarEvaluator.DrawQualityIcon(_questMeshQuality);
                         GUILayout.FlexibleSpace();
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal(GUI.skin.box);
+                        EditorGUILayout.LabelField("Skinned Mesh Memory: ", AvatarEvaluator.ToMebiByteString(_sizeAllSkinnedMeshes), GUILayout.Width(250));
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal(GUI.skin.box);
+                        EditorGUILayout.LabelField("Basic Mesh Memory: ", AvatarEvaluator.ToMebiByteString(_sizeAllBasicMeshes), GUILayout.Width(250));
                     EditorGUILayout.EndHorizontal();
                 EditorGUILayout.EndVertical();
                 
@@ -734,7 +750,6 @@ namespace Thry.AvatarHelpers
                     }
 
                     EditorGUILayout.EndFoldoutHeaderGroup();
-
                     _meshesFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(_meshesFoldout, $"Meshes  ({AvatarEvaluator.ToMebiByteString(_sizeAllMeshes)})");
                     if (_meshesFoldout)
                     {
@@ -871,10 +886,13 @@ namespace Thry.AvatarHelpers
                 EditorUtility.DisplayProgressBar("Getting VRAM Data", "Getting Textures", 0.5f);
                 Dictionary<Texture, bool> textures = GetTextures(avatar);
                 _texturesList = new List<TextureInfo>();
+
                 _sizeAll = 0;
                 _sizeActive = 0;
                 _sizeAllTextures = 0;
                 _sizeAllMeshes = 0;
+                _sizeAllSkinnedMeshes = 0;
+                _sizeAllBasicMeshes = 0;
 
                 int numTextures = textures.Keys.Count;
                 int texIdx = 1;
@@ -902,9 +920,16 @@ namespace Thry.AvatarHelpers
 
                 EditorUtility.DisplayProgressBar("Getting VRAM Data", "Getting Meshes", 0.5f);
                 //Meshes
+               
                 Dictionary<Mesh, bool> meshes = new Dictionary<Mesh, bool>();
-                IEnumerable<Mesh> allMeshes = avatar.GetComponentsInChildren<Renderer>(true).Select(r => r is SkinnedMeshRenderer ? (r as SkinnedMeshRenderer).sharedMesh : r is MeshRenderer ? r.GetComponent<MeshFilter>().sharedMesh : null);
-                IEnumerable<Mesh> activeMeshes = avatar.GetComponentsInChildren<Renderer>().Select(r => r is SkinnedMeshRenderer ? (r as SkinnedMeshRenderer).sharedMesh : r is MeshRenderer ? r.GetComponent<MeshFilter>().sharedMesh : null);
+
+                Func<Renderer, Mesh> toMesh = r =>
+                    r is SkinnedMeshRenderer smr ? smr.sharedMesh :
+                    r is MeshRenderer && r.TryGetComponent(out MeshFilter mf) ? mf.sharedMesh : null;
+
+                IEnumerable<Mesh> allMeshes = _avatar.GetComponentsInChildren<Renderer>(true).Select(toMesh);
+                HashSet<Mesh> activeMeshes = new HashSet<Mesh>(_avatar.GetComponentsInChildren<Renderer>().Select(toMesh));
+
                 foreach (Mesh m in allMeshes)
                 {
                     if (m == null) continue;
@@ -919,6 +944,12 @@ namespace Thry.AvatarHelpers
                     }
                 }
 
+                HashSet<Mesh> skinnedMeshes = new HashSet<Mesh>(
+                    _avatar.GetComponentsInChildren<SkinnedMeshRenderer>(true)
+                        .Select(smr => smr.sharedMesh)
+                        .Where(mesh => mesh != null)
+                );
+
                 int numMeshes = meshes.Keys.Count;
                 int meshIdx = 1;
                 _meshesList = new List<MeshInfo>();
@@ -928,6 +959,11 @@ namespace Thry.AvatarHelpers
                     long bytes = CalculateMeshSize(m.Key);
                     if (m.Value) _sizeActive += bytes;
                     _sizeAllMeshes += bytes;
+
+                    if (skinnedMeshes.Contains(m.Key))
+                        _sizeAllSkinnedMeshes += bytes;
+                    else   
+                        _sizeAllBasicMeshes += bytes;
 
                     MeshInfo meshInfo = new MeshInfo();
                     meshInfo.mesh = m.Key;
@@ -944,8 +980,13 @@ namespace Thry.AvatarHelpers
                 // Assign quality
                 _pcTextureQuality = GetTextureQuality(_sizeAllTextures, false);
                 _pcMeshQuality = GetMeshQuality(_sizeAllMeshes, false);
+                _pcSkinnedMeshQuality = GetMeshQuality(_sizeAllSkinnedMeshes, false);
+                _pcBasicMeshQuality = GetMeshQuality(_sizeAllBasicMeshes, false);
+
                 _questTextureQuality = GetTextureQuality(_sizeAllTextures, true);
                 _questMeshQuality = GetMeshQuality(_sizeAllMeshes, true);
+                _questSkinnedMeshQuality = GetMeshQuality(_sizeAllSkinnedMeshes, true);
+                _questBasicMeshQuality = GetMeshQuality(_sizeAllBasicMeshes, true);
             } finally {
                 EditorUtility.ClearProgressBar();
             }
