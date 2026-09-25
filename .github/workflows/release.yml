@@ -1,10 +1,10 @@
 name: Build Release
 
-on: 
+on:
   workflow_dispatch:
   push:
-    branches: main
-    paths: ./
+    branches:
+      - master
 
 env:
   packageName: "dev.ekimoco.vrc.avatar-performance-tools"
